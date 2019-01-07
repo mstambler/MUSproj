@@ -9,6 +9,13 @@ import math
 from pythonosc import dispatcher
 from pythonosc import osc_server
 
+filename = ""
+
+def print_filename_handler(unused_addr, args, name):
+  print("[{0}] ~ {1}".format(args[0], name))
+  filename = volume
+  print("Filename updated to %s" % filename)
+
 def print_volume_handler(unused_addr, args, volume):
   print("[{0}] ~ {1}".format(args[0], volume))
 
@@ -26,7 +33,7 @@ if __name__ == "__main__":
   args = parser.parse_args()
 
   dispatcher = dispatcher.Dispatcher()
-  dispatcher.map("/filter", print)
+  dispatcher.map("/filename", print_filename_handler, "Filename")
   dispatcher.map("/volume", print_volume_handler, "Volume")
   dispatcher.map("/logvolume", print_compute_handler, "Log volume", math.log)
 
