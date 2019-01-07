@@ -25,15 +25,14 @@ for filename in sys.stdin:
   downsample = 1
   samplerate = 44100 // downsample
 
-  win_s = 4096 // downsample # fft size      512
-  hop_s = 512 // downsample # hop size       256
+  win_s = 4096 // downsample
+  hop_s = 512 // downsample
 
   s = source(filename.strip(), samplerate, hop_s)
   samplerate = s.samplerate
 
   tolerance = 0.8
 
-  # notes_o = notes("default", win_s, hop_s, samplerate)
   pitch_o = pitch("yin", win_s, hop_s, samplerate)
   pitch_o.set_unit("midi")
   pitch_o.set_tolerance(tolerance)
@@ -42,19 +41,11 @@ for filename in sys.stdin:
   pitches = []
   confidences = []
 
-  # print("%8s" % "time","[ start","vel","last ]")
   # total number of frames read
   total_frames = 0
   while True:
     samples, read = s()
-    # new_note = notes_o(samples)
     pitch = pitch_o(samples)[0]
-    '''if (new_note[0] != 0):
-      note_str = ' '.join(["%.2f" % i for i in new_note])
-      onset = total_frames/float(samplerate)
-      send_string = str(onset) + " " + note_str
-      print("%.6f" % onset, note_str)
-      client.send_message("/note", send_string)'''
     #pitch = int(round(pitch))
     confidence = pitch_o.get_confidence()
     # if confidence < 0.8: pitch = 0.

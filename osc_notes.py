@@ -25,18 +25,15 @@ for filename in sys.stdin:
   downsample = 1
   samplerate = 44100 // downsample
 
-  win_s = 4096 // downsample # fft size      512
-  hop_s = 512 // downsample # hop size       256
+  win_s = 512 // downsample # fft size
+  hop_s = 256 // downsample # hop size
 
   s = source(filename.strip(), samplerate, hop_s)
   samplerate = s.samplerate
 
   tolerance = 0.8
 
-  # notes_o = notes("default", win_s, hop_s, samplerate)
-  pitch_o = pitch("yin", win_s, hop_s, samplerate)
-  pitch_o.set_unit("midi")
-  pitch_o.set_tolerance(tolerance)
+  notes_o = notes("default", win_s, hop_s, samplerate)
 
   times = []
   pitches = []
@@ -47,26 +44,19 @@ for filename in sys.stdin:
   total_frames = 0
   while True:
     samples, read = s()
-    # new_note = notes_o(samples)
-    pitch = pitch_o(samples)[0]
-    '''if (new_note[0] != 0):
+    new_note = notes_o(samples)
+    if (new_note[0] != 0):
       note_str = ' '.join(["%.2f" % i for i in new_note])
       onset = total_frames/float(samplerate)
-      send_string = str(onset) + " " + note_str
-      print("%.6f" % onset, note_str)
-      client.send_message("/note", send_string)'''
-    #pitch = int(round(pitch))
-    confidence = pitch_o.get_confidence()
-    # if confidence < 0.8: pitch = 0.
-    print("%f %f %f" % (total_frames / float(samplerate), pitch, confidence))
-    times += [total_frames / float(samplerate)]
-    pitches += [pitch]
-    confidences += [confidence]
+      # print("%.6f" % onset, new_note)
+      times += [onset]
+      pitches += [new_note[0]]
     total_frames += read
     if read < hop_s: break
+
   for i in range(len(pitches)-1):
     t = times[i+1] - times[i]
     p = pitches[i]
-    client.send_message("/note", str(p))
+    client.send_message("/note", str(p) + " " + str(t))
     time.sleep(t)
 

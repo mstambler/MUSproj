@@ -12,17 +12,11 @@ from pythonosc import osc_server
 filename = ""
 
 def print_filename_handler(unused_addr, args, name):
-  print("[{0}] ~ {1}".format(args[0], name))
-  filename = volume
-  print("Filename updated to %s" % filename)
+  #print("[{0}] ~ {1}".format(args[0], name))
+  filename = name
+  #print("Filename updated to %s" % filename)
+  print(name)
 
-def print_volume_handler(unused_addr, args, volume):
-  print("[{0}] ~ {1}".format(args[0], volume))
-
-def print_compute_handler(unused_addr, args, volume):
-  try:
-    print("[{0}] ~ {1}".format(args[0], args[1](volume)))
-  except ValueError: pass
 
 if __name__ == "__main__":
   parser = argparse.ArgumentParser()
@@ -34,10 +28,8 @@ if __name__ == "__main__":
 
   dispatcher = dispatcher.Dispatcher()
   dispatcher.map("/filename", print_filename_handler, "Filename")
-  dispatcher.map("/volume", print_volume_handler, "Volume")
-  dispatcher.map("/logvolume", print_compute_handler, "Log volume", math.log)
 
   server = osc_server.ThreadingOSCUDPServer(
       (args.ip, args.port), dispatcher)
-  print("Serving on {}".format(server.server_address))
+  #print("Serving on {}".format(server.server_address))
   server.serve_forever()
