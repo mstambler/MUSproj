@@ -54,9 +54,13 @@ for filename in sys.stdin:
     total_frames += read
     if read < hop_s: break
 
+  client.send_message("/onoff", 1)
   for i in range(len(pitches)-1):
     t = times[i+1] - times[i]
     p = pitches[i]
     client.send_message("/note", str(p) + " " + str(t))
     time.sleep(t)
 
+  client.send_message("/onoff", 0)
+  time.sleep(1)
+  client.send_message("/inc")
