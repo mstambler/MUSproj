@@ -63,4 +63,4 @@ for filename in sys.stdin:
 
   client.send_message("/onoff", 0)
   time.sleep(1)
-  client.send_message("/inc")
+  client.send_message("/inc", 0)
