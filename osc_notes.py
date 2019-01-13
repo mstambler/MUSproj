@@ -19,8 +19,8 @@ for filename in sys.stdin:
   downsample = 1
   samplerate = 44100 // downsample
 
-  win_s = 512 // downsample # fft size
-  hop_s = 256 // downsample # hop size
+  win_s = 2048 // downsample # fft size
+  hop_s = 512 // downsample # hop size
 
   s = source(filename.strip(), samplerate, hop_s)
   samplerate = s.samplerate
@@ -28,6 +28,8 @@ for filename in sys.stdin:
   tolerance = 0.8
 
   notes_o = notes("default", win_s, hop_s, samplerate)
+  notes_o.set_silence(-40)
+  notes_o.set_minioi_ms(200)
 
   times = []
   pitches = []
