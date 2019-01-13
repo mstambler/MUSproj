@@ -33,7 +33,7 @@ for filename in sys.stdin:
   tolerance = 0.8
 
   notes_o = notes("default", win_s, hop_s, samplerate)
-  notes_o.set_silence(-40)
+  notes_o.set_silence(-30)
   notes_o.set_minioi_ms(200)
 
   times = []
