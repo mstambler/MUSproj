@@ -3,7 +3,7 @@
 To run:
 
 First, execute run.sh in the terminal. 
-Then, open receive.maxpat using Max/MSP and follow instructions. 
+Then, open voice_symphony.maxpat using Max/MSP and follow instructions. 
 
 ----
 ## changelog

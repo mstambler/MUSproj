@@ -1,7 +1,6 @@
-"""Small example OSC server
+"""
+Receive filenames from Max and send to note detection python program.
 
-This program listens to several addresses, and prints some information about
-received packets.
 """
 import argparse
 import math

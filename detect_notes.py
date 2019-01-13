@@ -1,8 +1,8 @@
-"""Small example OSC client
+'''
+Receive file names and run aubio's pitch detection,
+then send MIDI data back to Max
+'''
 
-This program sends 10 random values between 0.0 and 1.0 to the /filter address,
-waiting for 1 seconds between each value.
-"""
 import argparse
 import random
 import time
@@ -12,7 +12,6 @@ from pythonosc import osc_message_builder
 from pythonosc import udp_client
 
 from aubio import source, notes, pitch
-
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--ip", default="127.0.0.1", help="The ip of the OSC server")
@@ -25,48 +24,43 @@ for filename in sys.stdin:
   downsample = 1
   samplerate = 44100 // downsample
 
-  win_s = 4096 // downsample # fft size      512
-  hop_s = 512 // downsample # hop size       256
+  win_s = 2048 // downsample # fft size
+  hop_s = 512 // downsample # hop size
 
   s = source(filename.strip(), samplerate, hop_s)
   samplerate = s.samplerate
 
   tolerance = 0.8
 
-  # notes_o = notes("default", win_s, hop_s, samplerate)
-  pitch_o = pitch("yin", win_s, hop_s, samplerate)
-  pitch_o.set_unit("midi")
-  pitch_o.set_tolerance(tolerance)
+  notes_o = notes("default", win_s, hop_s, samplerate)
+  notes_o.set_silence(-40)
+  notes_o.set_minioi_ms(200)
 
   times = []
   pitches = []
   confidences = []
 
-  # print("%8s" % "time","[ start","vel","last ]")
   # total number of frames read
   total_frames = 0
   while True:
     samples, read = s()
-    # new_note = notes_o(samples)
-    pitch = pitch_o(samples)[0]
-    '''if (new_note[0] != 0):
+    new_note = notes_o(samples)
+    if (new_note[0] != 0):
       note_str = ' '.join(["%.2f" % i for i in new_note])
       onset = total_frames/float(samplerate)
-      send_string = str(onset) + " " + note_str
-      print("%.6f" % onset, note_str)
-      client.send_message("/note", send_string)'''
-    #pitch = int(round(pitch))
-    confidence = pitch_o.get_confidence()
-    # if confidence < 0.8: pitch = 0.
-    print("%f %f %f" % (total_frames / float(samplerate), pitch, confidence))
-    times += [total_frames / float(samplerate)]
-    pitches += [pitch]
-    confidences += [confidence]
+      times += [onset]
+      pitches += [new_note[0]]
     total_frames += read
     if read < hop_s: break
+
+  client.send_message("/onoff", 1)
   for i in range(len(pitches)-1):
     t = times[i+1] - times[i]
     p = pitches[i]
-    client.send_message("/note", str(p))
+    client.send_message("/note", str(p) + " " + str(t))
     time.sleep(t)
 
+  client.send_message("/onoff", 0)
+  time.sleep(1)
+  client.send_message("/inc", 0)
+  

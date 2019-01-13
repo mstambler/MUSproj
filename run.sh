@@ -1,1 +1,1 @@
-python -u osc_serve.py | python osc_notes.py
+python -u receive.py | python detect_notes.py
